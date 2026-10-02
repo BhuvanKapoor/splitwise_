@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Split Expenses</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Split Expenses</h1>
+    <p class="subtitle">Add people, log who paid, and choose who shares each expense.</p>
+  </header>
+
+  <main>
+    <section class="card" id="people-section">
+      <h2>People</h2>
+      <form id="person-form" class="row">
+        <input id="person-name" type="text" placeholder="Name" maxlength="40" required />
+        <button type="submit">Add</button>
+      </form>
+      <ul id="people-list" class="chips"></ul>
+    </section>
+
+    <section class="card" id="expense-section">
+      <h2>Add expense</h2>
+      <form id="expense-form">
+        <label>
+          Description
+          <input id="exp-desc" type="text" placeholder="e.g. Dinner" maxlength="80" required />
+        </label>
+        <div class="row">
+          <label class="grow">
+            Amount
+            <input id="exp-amount" type="number" min="0.01" step="0.01" placeholder="0.00" required />
+          </label>
+          <label class="grow">
+            Paid by
+            <select id="exp-payer" required></select>
+          </label>
+        </div>
+
+        <fieldset>
+          <legend>Split</legend>
+          <div class="row split-mode">
+            <label class="inline"><input type="radio" name="split-mode" value="equal" checked /> Equally</label>
+            <label class="inline"><input type="radio" name="split-mode" value="exact" /> Exact amounts</label>
+          </div>
+          <div class="row small-actions">
+            <button type="button" class="link" id="select-all">Select all</button>
+            <button type="button" class="link" id="select-none">Select none</button>
+          </div>
+          <ul id="split-list" class="split-list"></ul>
+          <p id="split-summary" class="muted"></p>
+        </fieldset>
+
+        <p id="expense-error" class="error" hidden></p>
+        <button type="submit" class="primary">Add expense</button>
+      </form>
+    </section>
+
+    <section class="card" id="balances-section">
+      <h2>Balances</h2>
+      <ul id="balances-list" class="balances"></ul>
+      <h3>Settle up</h3>
+      <ul id="settle-list" class="settle"></ul>
+    </section>
+
+    <section class="card" id="history-section">
+      <div class="row space-between">
+        <h2>Expenses</h2>
+        <button type="button" class="danger link" id="reset-all">Reset everything</button>
+      </div>
+      <ul id="expense-list" class="expenses"></ul>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
