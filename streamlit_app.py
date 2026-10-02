@@ -5,7 +5,6 @@ Run with:  streamlit run streamlit_app.py
 
 from __future__ import annotations
 
-import sqlite3
 from datetime import date
 
 import pandas as pd
@@ -17,7 +16,13 @@ from splitter import compute_balances, compute_settlements, equal_shares, fmt, t
 CURRENCIES = ["₹", "$", "€", "£", "¥", "AED", "SGD", "THB"]
 
 st.set_page_config(page_title="Trip Splitter", page_icon="💸", layout="wide")
-storage.init_db()
+try:
+    storage.init_db()
+except Exception as exc:
+    st.error(f"Couldn't connect to storage: {exc}")
+    st.info("If you're using Google Sheets, check the `[gcp_service_account]` and `[google_sheets]` "
+            "sections of your secrets, and that the sheet is shared with the service account's email.")
+    st.stop()
 
 
 # ---------- helpers ----------
@@ -58,6 +63,7 @@ if st.session_state["trip_id"] not in trip_ids:
 
 with st.sidebar:
     st.title("💸 Trip Splitter")
+    st.caption(f"Saving to **{storage.BACKEND_NAME}**")
 
     with st.expander("➕ New trip", expanded=not trips):
         with st.form("new_trip", clear_on_submit=True):
@@ -72,7 +78,7 @@ with st.sidebar:
                         select_trip(storage.create_trip(name, new_currency))
                         flash(f"Created trip **{name}**. Add the people on this trip next.")
                         st.rerun()
-                    except sqlite3.IntegrityError:
+                    except storage.DuplicateError:
                         st.error(f"A trip called “{name}” already exists.")
 
     if trips:
@@ -298,7 +304,7 @@ with tab_people:
                     storage.add_person(trip_id, name)
                     flash(f"Added **{name}**.")
                     st.rerun()
-                except sqlite3.IntegrityError:
+                except storage.DuplicateError:
                     st.error(f"{name} is already on this trip.")
 
     if not people:
@@ -327,7 +333,7 @@ with tab_settings:
                 storage.rename_trip(trip_id, new_name.strip() or trip["name"], new_cur)
                 flash("Trip updated.")
                 st.rerun()
-            except sqlite3.IntegrityError:
+            except storage.DuplicateError:
                 st.error("Another trip already has that name.")
 
     st.divider()
