@@ -248,5 +248,13 @@ class SheetsDB:
 def connect(service_account_info: dict, spreadsheet: str) -> SheetsDB:
     """Open the spreadsheet by URL or key using a service account."""
     client = gspread.service_account_from_dict(dict(service_account_info))
-    sh = client.open_by_url(spreadsheet) if spreadsheet.startswith("http") else client.open_by_key(spreadsheet)
+    try:
+        sh = client.open_by_url(spreadsheet) if spreadsheet.startswith("http") else client.open_by_key(spreadsheet)
+    except PermissionError as exc:
+        # gspread hides Google's explanation (API disabled, sheet not shared, ...) in the cause.
+        cause = exc.__cause__
+        detail = cause.response.json().get("error", {}).get("message") if isinstance(cause, gspread.exceptions.APIError) else None
+        raise PermissionError(
+            detail or f"No access to the sheet. Share it as Editor with {service_account_info.get('client_email')}."
+        ) from exc
     return SheetsDB(sh)
