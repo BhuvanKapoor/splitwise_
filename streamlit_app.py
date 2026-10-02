@@ -10,12 +10,15 @@ from datetime import date
 import pandas as pd
 import streamlit as st
 
+import auth
 import storage
 from splitter import compute_balances, compute_settlements, equal_shares, fmt, to_cents
 
 CURRENCIES = ["₹", "$", "€", "£", "¥", "AED", "SGD", "THB"]
 
 st.set_page_config(page_title="Trip Splitter", page_icon="💸", layout="wide")
+auth.require_login()
+
 try:
     storage.init_db()
 except Exception as exc:
@@ -64,6 +67,7 @@ if st.session_state["trip_id"] not in trip_ids:
 with st.sidebar:
     st.title("💸 Trip Splitter")
     st.caption(f"Saving to **{storage.BACKEND_NAME}**")
+    auth.sidebar_account()
 
     with st.expander("➕ New trip", expanded=not trips):
         with st.form("new_trip", clear_on_submit=True):

@@ -19,6 +19,18 @@ streamlit run streamlit_app.py
 - Search and delete expenses, and download a trip as CSV
 - Rename a trip, change its currency, or delete it
 
+### Login
+
+Add an `[auth]` section to the secrets and the app asks for a username and password before showing anything:
+
+```toml
+[auth]
+username = "admin"
+password = "your-password"
+```
+
+Without it, the app runs without a login (the sidebar says so). You stay logged in until you tap **Log out** or reload the page.
+
 ### Where data is saved
 
 The sidebar shows which storage the app is using.
@@ -42,6 +54,10 @@ The sidebar shows which storage the app is using.
 2. Tap **Create app → Deploy a public app from GitHub**, choose this repository, the branch with the app, and `streamlit_app.py` as the main file.
 3. Open **Advanced settings → Secrets** and paste:
    ```toml
+   [auth]
+   username = "admin"
+   password = "your-password"
+
    [google_sheets]
    spreadsheet = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_KEY/edit"
    service_account_json = '''
