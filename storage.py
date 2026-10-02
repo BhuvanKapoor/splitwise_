@@ -1,11 +1,14 @@
 """Picks the storage backend: Google Sheets when configured, otherwise local SQLite.
 
 Google Sheets is used when `.streamlit/secrets.toml` (or the Streamlit Cloud
-secrets box) has both a [gcp_service_account] section and
-[google_sheets] spreadsheet = "<sheet URL or key>". See README.md.
+secrets box) has [google_sheets] spreadsheet = "<sheet URL or key>" plus the
+service account key, either as a [gcp_service_account] section or pasted as JSON
+in [google_sheets] service_account_json. See README.md.
 """
 
 from __future__ import annotations
+
+import json
 
 from errors import DuplicateError  # noqa: F401  (re-exported for the app)
 
@@ -17,9 +20,13 @@ def _sheets_config():
     try:
         import streamlit as st
 
+        sheets = st.secrets.get("google_sheets", {})
+        sheet = sheets.get("spreadsheet")
         account = st.secrets.get("gcp_service_account")
-        sheet = st.secrets.get("google_sheets", {}).get("spreadsheet")
-    except Exception:  # no secrets file
+        if not account and sheets.get("service_account_json"):
+            # The JSON key file pasted as-is, which is easier than converting it to TOML.
+            account = json.loads(sheets["service_account_json"])
+    except FileNotFoundError:  # no secrets file
         return None
     return (account, sheet) if account and sheet else None
 

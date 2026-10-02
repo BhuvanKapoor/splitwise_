@@ -31,9 +31,24 @@ The sidebar shows which storage the app is using.
 1. In the [Google Cloud console](https://console.cloud.google.com/), create (or pick) a project and enable the **Google Sheets API**.
 2. Go to **IAM & Admin → Service accounts**, create a service account, then under **Keys → Add key → JSON** download its key file.
 3. Create an empty Google Sheet and **share it with the service account's email** (`...@...iam.gserviceaccount.com`) as an **Editor**.
-4. Copy `.streamlit/secrets.toml.example` to `.streamlit/secrets.toml`, put the sheet's URL under `[google_sheets]`, and copy the fields from the JSON key into `[gcp_service_account]`.
-   On Streamlit Community Cloud, paste the same content into **App settings → Secrets** instead.
+4. Add the secrets, laid out like `.streamlit/secrets.toml.example`: the sheet's URL as `spreadsheet`, and the whole JSON key file pasted unchanged between the `'''` quotes of `service_account_json`.
+   - **Streamlit Community Cloud:** paste them into the app's **Settings → Secrets** box (see below).
+   - **Locally:** save them as `.streamlit/secrets.toml`.
 5. Restart the app. The sidebar should say **Saving to Google Sheets**.
+
+### Deploying to Streamlit Community Cloud (works from a phone)
+
+1. Go to [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
+2. Tap **Create app → Deploy a public app from GitHub**, choose this repository, the branch with the app, and `streamlit_app.py` as the main file.
+3. Open **Advanced settings → Secrets** and paste:
+   ```toml
+   [google_sheets]
+   spreadsheet = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_KEY/edit"
+   service_account_json = '''
+   PASTE THE WHOLE JSON KEY FILE HERE
+   '''
+   ```
+4. Tap **Deploy**. You can change the secrets later under the app's **Settings → Secrets**.
 
 The app creates four tabs in the sheet the first time it runs:
 
